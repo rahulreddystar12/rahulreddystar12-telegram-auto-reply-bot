@@ -1,9 +1,14 @@
+import os
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 
-api_id = 28510573
-api_hash = '3c9481bac2bba3f63e284f2c7994ba95'
+# Load from environment
+api_id = int(os.getenv('API_ID'))
+api_hash = os.getenv('API_HASH')
+session_string = os.getenv('SESSION_STRING')
 
-client = TelegramClient('session', api_id, api_hash)
+# Initialize with StringSession
+client = TelegramClient(StringSession(session_string), api_id, api_hash)
 
 replied_users = set()
 
@@ -31,7 +36,11 @@ async def handler(event):
     if event.is_private:
         sender_id = event.sender_id
         if sender_id not in replied_users:
-            await client.send_message(event.chat_id, reply_text, parse_mode=None, link_preview=False)
+            await client.send_message(
+                event.chat_id, reply_text,
+                parse_mode=None,
+                link_preview=False
+            )
             replied_users.add(sender_id)
 
 print("🤖 Auto-reply is active. Press Ctrl+C to stop.")
